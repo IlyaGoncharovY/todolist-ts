@@ -16,8 +16,8 @@ type PropsType = {
 }
 
 export const TodolistsList: React.FC<PropsType> = ({demo = false}) => {
+
     const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
-    const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const isLoggedIn = useSelector(selectIsLoggedIn)
 
     const dispatch = useAppDispatch()
@@ -45,7 +45,9 @@ export const TodolistsList: React.FC<PropsType> = ({demo = false}) => {
         if (demo || !isLoggedIn) {
             return
         }
-        fetchTodolistsTC()
+        if(!todolists.length) {
+            fetchTodolistsTC()
+        }
     }, [])
 
 
@@ -60,13 +62,13 @@ export const TodolistsList: React.FC<PropsType> = ({demo = false}) => {
         <Grid container spacing={3} style={{flexWrap: 'nowrap', overflowX: 'scroll'}}>
             {
                 todolists.map(tl => {
-                    let allTodolistTasks = tasks[tl.id]
+                    // let allTodolistTasks = tasks[tl.id]
 
                     return <Grid item key={tl.id}>
                         <div style={{width: '300px'}}>
                             <Todolist
                                 todolist={tl}
-                                tasks={allTodolistTasks}
+                                // tasks={allTodolistTasks}
                                 demo={demo}
                             />
                         </div>

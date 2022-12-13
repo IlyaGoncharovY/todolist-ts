@@ -8,14 +8,19 @@ import {FilterValuesType, TodolistDomainType} from '../todolists-reducer'
 import {tasksActions, todolistsActions} from '../index'
 import {TaskStatuses, TaskType} from '../../../api/types'
 import {useActions, useAppDispatch} from '../../../utils/redux-utils'
+import {useSelector} from "react-redux";
+import {AppRootStateType} from "../../../utils/types";
 
 type PropsType = {
     todolist: TodolistDomainType
-    tasks: Array<TaskType>
+    // tasks: Array<TaskType>
     demo?: boolean
 }
 
 export const Todolist = React.memo(function ({demo = false, ...props}: PropsType) {
+
+    const tasks = useSelector<AppRootStateType, TaskType[]>(state => state.tasks[props.todolist.id])
+
     const {fetchTasks} = useActions(tasksActions)
     const {changeTodolistFilter, removeTodolistTC, changeTodolistTitleTC} = useActions(todolistsActions)
 
@@ -25,7 +30,9 @@ export const Todolist = React.memo(function ({demo = false, ...props}: PropsType
         if (demo) {
             return
         }
-        fetchTasks(props.todolist.id)
+        if(!tasks.length) {
+            fetchTasks(props.todolist.id)
+        }
     }, [])
 
     const addTaskCallback = useCallback(async (title: string, helper: AddItemFormSubmitHelperType) => {
@@ -58,13 +65,13 @@ export const Todolist = React.memo(function ({demo = false, ...props}: PropsType
         id: props.todolist.id
     }), [props.todolist.id])
 
-    let tasksForTodolist = props.tasks
+    let tasksForTodolist = tasks
 
     if (props.todolist.filter === 'active') {
-        tasksForTodolist = props.tasks.filter(t => t.status === TaskStatuses.New)
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.New)
     }
     if (props.todolist.filter === 'completed') {
-        tasksForTodolist = props.tasks.filter(t => t.status === TaskStatuses.Completed)
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.Completed)
     }
 
     const renderFilterButton = (buttonFilter: FilterValuesType,
